@@ -1,51 +1,55 @@
-import os
 import streamlit as st
-from dotenv import load_dotenv
-from langchain import hub
-from langchain.agents import AgentExecutor, create_openai_tools_agent, load_tools
-from langchain.memory import ConversationBufferMemory
-from langchain.schema import HumanMessage
-from langchain_community.chat_message_histories import StreamlitChatMessageHistory
-from langchain_community.callbacks import StreamlitCallbackHandler
-from langchain_openai import ChatOpenAI
-from collections.abc import MutableSet
 
+st.image("./assets/banner.png", use_container_width=True)
 
-load_dotenv()
+# PAGE SETUP
+account_page = st.Page(
+    page="views/account.py",
+    title="계정정보",
+    # icon="👤",
+    icon=":material/account_circle:",
+)
+search_word_page = st.Page(
+    page="views/search_word.py",
+    title="단어검색",
+    # icon="🔍",
+    icon=":material/search:",
+    default=True,
+)
+recommend_word_page = st.Page(
+    page="views/recommend_word.py",
+    title="추천단어",
+    # icon="✌️",
+    icon=":material/featured_play_list:",
+)
+history_word_page = st.Page(
+    page="views/history_word.py",
+    title="이전학습단어",
+    # icon="📖",
+    icon=":material/import_contacts:",
+)
+statistic_word_page = st.Page(
+    page="views/statistic_word.py",
+    title="학습통계",
+    # icon="📊",
+    icon=":material/insert_chart_outlined:",
+)
 
-def create_agent_chain(history):
-    chat = ChatOpenAI(
-        model=os.getenv("OPENAI_API_MODEL"),
-        temperature=os.getenv("OPENAI_API_TEMPERATURE"),
-    )
-    tools = load_tools(["ddg-search", "wikipedia"])
-    prompt = hub.pull("hwchase17/openai-tools-agent")
-    memory = ConversationBufferMemory(
-        chat_memory=history, memory_key="chat_key", return_messages=True
-    )
-    
-    agent = create_openai_tools_agent(chat, tools, prompt)
-    return AgentExecutor(agent=agent, tools=tools, memory=memory)
+# Navigation setup
+# pg = st.navigation(pages=[account_page, recommend_word_page, history_word_page, statistic_word_page])
 
-st.title("🎈단비노트 챗봇서비스🎈")
+# Navigation setup with sections
+pg = st.navigation(
+    {
+        "계정": [account_page],
+        "단어검색": [search_word_page, recommend_word_page, history_word_page],
+        "학습통계": [statistic_word_page],
+    }
+)
 
-history = StreamlitChatMessageHistory()
-prompt = st.chat_input("""
-당신은 영어 사전 전문가입니다. 사용자가 입력한 영어 단어의 정의, 예문, 발음 등을 정확하게 제공해 주세요.
+# shared on all pages
+#st.logo("assets/banner.png")
+st.sidebar.text("단비노트에서 나만의 단어장을 만들어보세요!")
 
-사용자 질문: {input}
-""")
-
-if prompt:
-    with st.chat_message("user"):
-        history.add_user_message(prompt)
-        st.markdown(prompt)
-
-    with st.chat_message("assistant"):
-        callback = StreamlitCallbackHandler(st.container())
-        agent_chain = create_agent_chain(history)
-        response = agent_chain.invoke(
-            {"input": prompt},
-            {"callback": [callback]},
-        )
-        st.markdown(response["output"])
+# Run navigation
+pg.run()
