@@ -1,46 +1,39 @@
-import os
 import streamlit as st
-from dotenv import load_dotenv
-from langchain import hub
-from langchain.agents import AgentExecutor, create_openai_tools_agent, load_tools
-from langchain.memory import ConversationBufferMemory
-from langchain.schema import HumanMessage
-from langchain_community.chat_message_histories import StreamlitChatMessageHistory
-from langchain_community.callbacks import StreamlitCallbackHandler
-from langchain_openai import ChatOpenAI
-from collections.abc import MutableSet
 
-load_dotenv()
+st.markdown(
+    """
+    <style>
+    .stContainer {
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
-def create_agent_chain(history):
-    chat = ChatOpenAI(
-        model=os.getenv("OPENAI_API_MODEL"),
-        temperature=os.getenv("OPENAI_API_TEMPERATURE"),
-    )
-    tools = load_tools(["ddg-search", "wikipedia"])
-    prompt = hub.pull("hwchase17/openai-tools-agent")
-    memory = ConversationBufferMemory(
-        chat_memory=history, memory_key="chat_key", return_messages=True
-    )
+with st.container(border=True):
+    col1, col2 = st.columns(2)
+    with col1:
+        input = st.text_input("단어를 입력하세요.", value="", label_visibility="collapsed")
+    with col2:
+        search_button = st.button("검색")
+    placeholder = st.empty()
+    if search_button:
+        placeholder.text(f"'{input}'에 대한 검색 결과입니다.")
+
+
+st.divider()
+
+with st.container(border=True):
+    with st.expander("단어 검색"):
+        st.write("This is inside a container")
+        st.write("You can put any content you like here")
     
-    agent = create_openai_tools_agent(chat, tools, prompt)
-    return AgentExecutor(agent=agent, tools=tools, memory=memory)
+    with st.container(border=True):
+        st.write("This is inside a nested container")
+        st.write("You can put any content you like here")
+        st.write("Like text, images, or even interactive widgets")
+        st.write("You can also nest containers inside other containers")
 
-st.title("🎈단비노트 챗봇서비스🎈")
-
-history = StreamlitChatMessageHistory()
-prompt = st.chat_input("검색할 단어를 입력하세요.")
-
-if prompt:
-    with st.chat_message("user"):
-        history.add_user_message(prompt)
-        st.markdown(prompt)
-
-    with st.chat_message("assistant"):
-        callback = StreamlitCallbackHandler(st.container())
-        agent_chain = create_agent_chain(history)
-        response = agent_chain.invoke(
-            {"input": prompt},
-            {"callback": [callback]},
-        )
-        st.markdown(response["output"])
+    st.write("This is after the nested container")
