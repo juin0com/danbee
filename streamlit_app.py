@@ -3,8 +3,8 @@ import streamlit as st
 st.image("./assets/banner.png", use_container_width=True)
 
 # PAGE SETUP
-account_page = st.Page(
-    page="views/account.py",
+about_page = st.Page(
+    page="views/about.py",
     title="계정정보",
     # icon="👤",
     icon=":material/account_circle:",
@@ -41,7 +41,7 @@ statistic_word_page = st.Page(
 # Navigation setup with sections
 pg = st.navigation(
     {
-        "계정": [account_page],
+        "계정": [about_page],
         "단어검색": [search_word_page, recommend_word_page, history_word_page],
         "학습통계": [statistic_word_page],
     }
