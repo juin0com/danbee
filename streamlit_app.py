@@ -5,7 +5,7 @@ st.image("./assets/banner.png", use_container_width=True)
 # PAGE SETUP
 about_page = st.Page(
     page="views/about.py",
-    title="계정정보",
+    title="단비노트",
     # icon="👤",
     icon=":material/account_circle:",
 )
