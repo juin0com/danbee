@@ -1,33 +1,63 @@
 import os
 import streamlit as st
-from supabase import create_client
-
-#Supabase setup
-supabase_url = os.environ.get("SUPABASE_URL")
-supaabse_key = os.environ.get("SUPABASE_KEY")
-# supabase = create_client(supabase_url, supabase_key)
+from supabase import create_client, Client
 
 # page setup
 st.set_page_config(layout="wide")
+st.logo("./assets/logo_05.png",size="large")
+@st.cache_resource
+def init_connection():
+    url = st.secrets["SUPABASE_URL"]
+    key = st.secrets["SUPABASE_KEY"]
+    return create_client(url, key)
+
+supabase = init_connection()
+
+# @st.cache_resource(ttl=600)
+# def run_query():
+#     return supabase.table("mytable").select("*").execute()
+# rows = run_query()
+
 
 st.image("./assets/banner.png", use_container_width=True)
 
+# Session state initialization
+if "user" not in st.session_state:
+    st.session_state["user"] = None
+
+
 @st.dialog("로그인")
 def login():
-    st.text_input("아이디", key="login_id")
-    st.text_input("비밀번호", key="login_pw")
-    if st.button("로그인", key="login_dialog_btn"):
-        # 로그인 처리 로직 추가
-        pass
+    email = st.text_input("이메일", key="login_id")
+    password = st.text_input("비밀번호", key="login_pw")
+    if st.button("전송", key="login_dialog_btn"):
+        try:
+            auth_reaponse = supabase.auth.sign_in(email=email, password=password)
+            st.session_state["user"] = auth_reaponse.user
+            st.success("로그인이 성공하였습니다.")
+        except Exception as e:
+            st.error(f"로그인에 실패했습니다. : {str(e)}")
 
 @st.dialog("회원가입") 
 def signup():
-    st.text_input("아이디", key="signup_id")
-    st.text_input("비밀번호", key="signup_pw")
-    st.text_input("비밀번호 확인", key="signup_pw_confirm")
+    email = st.text_input("이에일", key="signup_id")
+    password = st.text_input("비밀번호", type="password", key="signup_pw")
+    password_confirm = st.text_input("비밀번호 확인", type="password", key="signup_pw_confirm")
     if st.button("회원가입", key="signup_dialog_btn"):
-        # 회원가입 처리 로직 추가
-        pass
+        if password != password_confirm:
+            st.error("비밀번호가 일치하지 않습니다.")
+        else:
+            try:
+                auth_response = supabase.auth.sign_up(email=email, password=password)
+                st.success("회원가입이 완료되었습니다.")
+                st.markdown("다시 로그인을 해주세요.")
+                st.balloons()
+            except Exception as e:
+                st.error(f"회원가입에 실패했습니다. : {str(e)}")
+        # 회원가입 처리 로직 추가 for supabase
+        st.success("회원가입이 완료되었습니다.")
+        st.markdown("다시 로그인을 해주세요.")
+        st.balloons()
 
 # Sidebar setup
 with st.sidebar:
