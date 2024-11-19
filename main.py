@@ -1,10 +1,10 @@
-import os
+import os , time
 import streamlit as st
 from supabase import create_client, Client
 
 # page setup
 st.set_page_config(layout="wide")
-st.logo("./assets/logo_05.png",size="large")
+st.logo("./assets/logo12.png",size="large")
 @st.cache_resource
 def init_connection():
     url = st.secrets["SUPABASE_URL"]
@@ -29,12 +29,15 @@ if "user" not in st.session_state:
 @st.dialog("로그인")
 def login():
     email = st.text_input("이메일", key="login_id")
-    password = st.text_input("비밀번호", key="login_pw")
+    password = st.text_input("비밀번호", type="password", key="login_pw")
     if st.button("전송", key="login_dialog_btn"):
         try:
-            auth_reaponse = supabase.auth.sign_in(email=email, password=password)
+            auth_reaponse = supabase.auth.sign_in_with_password({"email": email, "password": password})
             st.session_state["user"] = auth_reaponse.user
             st.success("로그인이 성공하였습니다.")
+            st.balloons()
+            time.sleep(2)
+            st.rerun()
         except Exception as e:
             st.error(f"로그인에 실패했습니다. : {str(e)}")
 
@@ -48,31 +51,36 @@ def signup():
             st.error("비밀번호가 일치하지 않습니다.")
         else:
             try:
-                auth_response = supabase.auth.sign_up(email=email, password=password)
+                auth_response = supabase.auth.sign_up({"email": email, "password": password})
+                st.session_state["user"] = auth_response.user
                 st.success("회원가입이 완료되었습니다.")
-                st.markdown("다시 로그인을 해주세요.")
                 st.balloons()
-            except Exception as e:
+                time.sleep(2)
+                st.rerun()
+            except Exception as e:  
                 st.error(f"회원가입에 실패했습니다. : {str(e)}")
-        # 회원가입 처리 로직 추가 for supabase
-        st.success("회원가입이 완료되었습니다.")
-        st.markdown("다시 로그인을 해주세요.")
-        st.balloons()
+   
 
 # Sidebar setup
 with st.sidebar:
-    st.header("계정정보")     
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("로그인", key="sidebar_login_btn"):
-            # 로그인 처리 로직 추가
-            login()
-            pass
-    with col2:
-        if st.button("회원가입", key="sidebar_signup_btn"):
-            # 회원가입 처리 로직 추가 
-            signup()
-            pass
+    st.subheader("계정정보")     
+    if st.session_state["user"]:
+        st.write(f"안녕하세요, {st.session_state['user'].email}님")
+        if st.button("로그아웃", key="sidebar_logout_btn"):
+            # 로그아웃 처리 로직 추가
+            supabase.auth.sign_out()
+            st.session_state["user"] = None
+            st.rerun()
+    else:
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("로그인", key="sidebar_login_btn"):
+                # 로그인 처리 로직 추가
+                login()
+        with col2:
+            if st.button("회원가입", key="sidebar_signup_btn"):
+                # 회원가입 처리 로직 추가 
+                signup()
 
 # 구분선 추가
 st.divider()
