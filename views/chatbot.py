@@ -1,6 +1,4 @@
-import os
 import streamlit as st
-from dotenv import load_dotenv
 from langchain import hub
 from langchain.agents import AgentExecutor, create_openai_tools_agent, load_tools
 from langchain.memory import ConversationBufferMemory
@@ -10,14 +8,13 @@ from langchain_community.callbacks import StreamlitCallbackHandler
 from langchain_openai import ChatOpenAI
 from collections.abc import MutableSet
 
-load_dotenv()
 
 def create_agent_chain(history):
     chat = ChatOpenAI(
-        model=os.getenv("OPENAI_API_MODEL"),
-        temperature=os.getenv("OPENAI_API_TEMPERATURE"),
+        model=st.secrets("OPENAI_API_MODEL"),
+        temperature=st.secrets("OPENAI_API_TEMPERATURE"),
     )
-    tools = load_tools(["ddg-search", "wikipedia"])
+    tools = load_tools(["Duolingo", "wikipedia","Memrise"])
     prompt = hub.pull("hwchase17/openai-tools-agent")
     memory = ConversationBufferMemory(
         chat_memory=history, memory_key="chat_key", return_messages=True

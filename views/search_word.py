@@ -1,7 +1,19 @@
 import streamlit as st
-import openai
+import  openai
+from langchain_openai import ChatOpenAI
+from langchain import hub
+from langchain.agents import AgentExecutor, create_openai_tools_agent, load_tools
+from langchain.memory import ConversationBufferMemory
+from langchain.schema import HumanMessage
+from langchain_community.chat_message_histories import StreamlitChatMessageHistory
+from langchain_community.callbacks import StreamlitCallbackHandler
+from langchain.agents import AgentExecutor, create_openai_tools_agent, load_tools
 
 openai.api_key = st.secrets["OPENAI_API_KEY"]
+
+# Session state initialization
+if 'search_result' not in st.session_state:
+    st.session_state['search_result'] = ""
 
 st.markdown(
     """
@@ -49,13 +61,47 @@ with st.container(border=True):
                     {"role": "user", "content": combined_question}
                 ]
             )
-            
-            # 응답 표시
-            with st.container():
-                st.write(response.choices[0].message.content)     
+            # save search result to session state
+            st.session_state['search_result'] = response.choices[0].message.content
+            if st.session_state['search_result']:
+                st.write(st.session_state['search_result'])    
+# agent making
+def create_agent_chain(history):
+    chat = ChatOpenAI(
+        # st.secrets() 함수 호출 방식이 잘못됨
+        model=st.secrets["OPENAI_API_MODEL"],
+        temperature=st.secrets["OPENAI_API_TEMPERATURE"],
+    )
+    
+    # Duolingo, Memrise는 기본 제공 도구가 아님
+    tools = load_tools(["wikipedia"])
+    
+    prompt = hub.pull("hwchase17/openai-tools-agent")
+    memory = ConversationBufferMemory(
+        chat_memory=history, 
+        memory_key="chat_history", # chat_key -> chat_history
+        return_messages=True
+    )
+    
+    agent = create_openai_tools_agent(chat, tools, prompt)
+    return AgentExecutor(agent=agent, tools=tools, memory=memory)
 
 with st.container(border=True):
-    with st.expander("AI 와 대화하기", expanded=True):
-        st.write("AI와 대화를 통해 단어에 대한 이해도를 높이세요")
+    st.subheader("🎈단비노트 챗봇서비스🎈")
+
+    history = StreamlitChatMessageHistory()
+    prompt = st.chat_input("검색할 단어를 입력하세요.")
+
+    if prompt:
+        with st.chat_message("user"):
+            history.add_user_message(prompt)
+            st.markdown(prompt)
     
-    st.write("This is ganerated by " + st.secrets["OPENAI_API_MODEL"])
+        with st.chat_message("assistant"):
+            callback = StreamlitCallbackHandler(st.container())
+            agent_chain = create_agent_chain(history)
+            response = agent_chain.invoke(
+                {"input": prompt},
+                callbacks=[callback]  # {"callback": [callback]} -> callbacks=[callback]
+            )
+            st.markdown(response["output"])
