@@ -4,7 +4,7 @@ from supabase import create_client, Client
 
 # page setup
 st.set_page_config(layout="wide")
-st.logo("./assets/logo12.png",size="large")
+st.logo("./assets/sidebar_revised.png",size="large")
 @st.cache_resource
 def init_connection():
     url = st.secrets["SUPABASE_URL"]
@@ -19,7 +19,7 @@ supabase = init_connection()
 # rows = run_query()
 
 
-st.image("./assets/banner.png", use_container_width=True, width=800)
+st.image("./assets/banner_10.png", use_container_width=True)
 
 # Session state initialization
 if "user" not in st.session_state:
