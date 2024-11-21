@@ -8,5 +8,6 @@ duckduckgo-search
 wikipedia
 supabase==2.10.0
 st-supabase-connection==2.0.1
-faiss-cpu
-chardet
+wordcloud
+plotly
+streamlit_plotly_events
