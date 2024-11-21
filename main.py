@@ -4,7 +4,7 @@ from supabase import create_client, Client
 
 # page setup
 st.set_page_config(layout="wide")
-st.logo("./assets/logo12.png",size="large")
+st.logo("./assets/danbee_sidebar_logo.jpg",size="large")
 @st.cache_resource
 def init_connection():
     url = st.secrets["SUPABASE_URL"]
