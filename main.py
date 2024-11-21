@@ -19,7 +19,7 @@ supabase = init_connection()
 # rows = run_query()
 
 
-st.image("./assets/banner_10.png", use_container_width=True)
+st.image("./assets/banner_03.jpg", use_container_width=True)
 
 # Session state initialization
 if "user" not in st.session_state:
