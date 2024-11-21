@@ -22,7 +22,7 @@ with st.container():
         st.write("- 메마른 기억에 내리는 지식의 단비")
         st.write("- 단비노트를 통해 일상을 기록하고, 공유해보세요.")
     with col2:
-        st.image("./assets/danbee_logo_big.jpg", use_container_width=True)
+        st.image("./assets/logo_about.jpg", use_container_width=True)
 
 st.write("")
 st.write("단비노트는 당신의 일상을 기록하고, 공유할 수 있는 서비스입니다.")
