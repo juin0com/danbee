@@ -46,6 +46,7 @@ with st.container():
                 with col:
                     if st.button(f"{word['lemma']}{category}"):
                         st.session_state['search_word'] = word['lemma']
+                        st.switch_page("views/search_word.py")
     else:
         st.write("선택한 조건의 단어가 없습니다")
 

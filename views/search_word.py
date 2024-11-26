@@ -29,11 +29,13 @@ div[data-testid="stHorizontalBlock"] {
 
 @st.fragment
 def search_word():
+    default_word = st.session_state.get('search_word', '')
+
     with st.container(border=True):
         with st.form(key="search_form"):
             col1, col2, col3 = st.columns(3)
             with col1:
-                input_word = st.text_input("단어를 입력하세요.", value="", label_visibility="collapsed")
+                input_word = st.text_input("단어를 입력하세요.", value=default_word, label_visibility="collapsed")
             with col2:
                 search_button = st.form_submit_button(label="검색")
             with col3:
@@ -106,7 +108,7 @@ def chatbot():
             # 세션 상태에 메시지 기록 초기화
             if "messages" not in st.session_state:
                 st.session_state.messages = []
-                
+                    
             # 저장된 대화 내용 표시
             for message in st.session_state.messages:
                 with st.chat_message(message["role"]):
@@ -116,24 +118,25 @@ def chatbot():
             prompt = st.chat_input("추가질문 할 내용을 입력하세요.")
         
             if prompt:
-                # 사용자 메시지 추가
-                with st.chat_message("user"):
-                    history.add_user_message(prompt)
-                    st.markdown(prompt)
-                    # 세션에 사용자 메시지 저장
-                    st.session_state.messages.append({"role": "user", "content": prompt})
-                
-                # AI 응답 생성 및 표시
-                with st.chat_message("assistant"):
-                    callback = StreamlitCallbackHandler(st.container())
-                    agent_chain = create_agent_chain(history)
-                    response = agent_chain.invoke(
-                        {"input": prompt},
-                        callbacks=[callback]
-                    )
-                    st.markdown(response["output"])
-                    # 세션에 AI 응답 저장
-                    st.session_state.messages.append({"role": "assistant", "content": response["output"]})
+                with st.spinner("답변을 생성하고 있습니다..."):
+                    # 사용자 메시지 추가
+                    with st.chat_message("user"):
+                        history.add_user_message(prompt)
+                        st.markdown(prompt)
+                        # 세션에 사용자 메시지 저장
+                        st.session_state.messages.append({"role": "user", "content": prompt})
+                    
+                    # AI 응답 생성 및 표시
+                    with st.chat_message("assistant"):
+                        callback = StreamlitCallbackHandler(st.container())
+                        agent_chain = create_agent_chain(history)
+                        response = agent_chain.invoke(
+                            {"input": prompt},
+                            callbacks=[callback]
+                        )
+                        st.markdown(response["output"])
+                        # 세션에 AI 응답 저장
+                        st.session_state.messages.append({"role": "assistant", "content": response["output"]})
         
         with tab2:
             # 이미지 URL을 저장할 session_state 초기화
