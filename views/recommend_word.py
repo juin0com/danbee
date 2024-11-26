@@ -1,49 +1,52 @@
 import streamlit as st
+from supabase import create_client, Client
 
-# 테스트용 단어 목록 생성
-import random
-import string
+# Supabase 클라이언트 초기화
+url = st.secrets["SUPABASE_URL"]
+key = st.secrets["SUPABASE_KEY"]
+supabase: Client = create_client(url, key)
 
-def generate_random_words(num_words):
-    words = []
-    themes = ['자연', '기술', '예술', '과학', '문학']
-    for _ in range(num_words):
-        word = ''.join(random.choices(string.ascii_lowercase, k=5))
-        importance = random.randint(1, 10)
-        theme = random.choice(themes)
-        words.append({'word': word, 'importance': importance, 'theme': theme})
-    return words
+# 카테고리 목록 가져오기
+response = supabase.table('word_list').select('category').execute()
+categories = list(set([item['category'] for item in response.data if item['category']]))
+categories.insert(0, '전체')  # '전체' 옵션 추가
 
-word_list = generate_random_words(50)
-
-st.title("추천단어")
-
-# 카테고리 선택 (radio)
-selected_theme = st.radio(
+st.subheader("🔎 검색조건을 입력하세요")
+# 사용자 입력 받기
+selected_category = st.radio(
     "카테고리를 선택하세요",
-    options=['전체', '자연', '기술', '예술', '과학', '문학', '경제', '스포츠', '역사'] , 
+    options=categories,
     label_visibility="hidden",
     horizontal=True,
 )
 
 # 중요도 선택 (slider)
-importance_level = st.slider("중요도를 선택하세요 (1: 기초 ~ 10: 고급)", 1, 10, 5)
+importance_level = st.slider("중요도를 선택하세요 (1: 기초 ~ 10: 고급)", 1, 10, 1)
 
-# 선택한 카테고리와 중요도로 단어 필터링
-filtered_words = [word for word in word_list 
-                 if word['importance'] == importance_level 
-                 and (selected_theme == '전체' or word['theme'] == selected_theme)]
+# 단어 필터링
+query = supabase.table('word_list').select('lemma', 'category').eq('rank', importance_level)
+if selected_category != '전체':
+    query = query.eq('category', selected_category)
+query = query.limit(20)  # 단어를 20개로 제한
+result = query.execute()  # execute() 메서드를 호출하여 쿼리 실행
 
+st.divider()
 # 단어 목록 표시
+st.subheader("👍추천 단어")
 with st.container():
-    if filtered_words:
-        for word in filtered_words:
-            if st.button(f"{word['word']} ({word['theme']})"):
-                st.session_state['search_word'] = word['word']
-                st.experimental_set_query_params()
-                st.experimental_rerun()
+    if result:
+        max_cols = 5  # 한 행에 표시할 최대 버튼 수
+        words = result.data
+        rows = [words[i:i+max_cols] for i in range(0, len(words), max_cols)]
+        for row in rows:
+            cols = st.columns(len(row))
+            for col, word in zip(cols, row):
+                category = f" ({word['category']})" if word['category'] else ""
+                with col:
+                    if st.button(f"{word['lemma']}{category}"):
+                        st.session_state['search_word'] = word['lemma']
     else:
-        st.write("선택한 조건의 단어가 없습니다.")
+        st.write("선택한 조건의 단어가 없습니다")
 
 # 검색 페이지로 연결
 if 'search_word' in st.session_state:
