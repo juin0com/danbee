@@ -12,16 +12,17 @@ categories = list(set([item['category'] for item in response.data if item['categ
 categories.insert(0, '전체')  # '전체' 옵션 추가
 
 st.subheader("🔎 검색조건을 입력하세요")
-# 사용자 입력 받기
-selected_category = st.radio(
-    "카테고리를 선택하세요",
-    options=categories,
-    label_visibility="hidden",
-    horizontal=True,
-)
+with st.container(border=True):
+    # 사용자 입력 받기
+    selected_category = st.radio(
+        "카테고리를 선택하세요",
+        options=categories,
+        label_visibility="hidden",
+        horizontal=True,
+    )
 
-# 중요도 선택 (slider)
-importance_level = st.slider("중요도를 선택하세요 (1: 기초 ~ 10: 고급)", 1, 10, 1)
+    # 중요도 선택 (slider)
+    importance_level = st.slider("중요도를 선택하세요 (1: 기초 ~ 10: 고급)", 1, 10, 1)
 
 # 단어 필터링
 query = supabase.table('word_list').select('lemma', 'category').eq('rank', importance_level)
