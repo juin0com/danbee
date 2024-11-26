@@ -1,5 +1,6 @@
 import streamlit as st
 import  openai
+from openai import OpenAI
 from langchain_openai import ChatOpenAI
 from langchain import hub
 from langchain.agents import AgentExecutor, create_openai_tools_agent, load_tools
@@ -97,24 +98,83 @@ def create_agent_chain(history):
 
 @st.fragment
 def chatbot():
+    
     with st.container(border=True):
         st.subheader("🎈단비노트 챗봇서비스🎈")
-
-        history = StreamlitChatMessageHistory()
-        prompt = st.chat_input("추가질문 할 내용을 입력하세요.")
-
-        if prompt:
-            with st.chat_message("user"):
-                history.add_user_message(prompt)
-                st.markdown(prompt)
+        tab1 , tab2 , tab3 = st.tabs(["대화", "이미지", "음성"])
+        with tab1:
+            # 세션 상태에 메시지 기록 초기화
+            if "messages" not in st.session_state:
+                st.session_state.messages = []
+                
+            # 저장된 대화 내용 표시
+            for message in st.session_state.messages:
+                with st.chat_message(message["role"]):
+                    st.markdown(message["content"])
+            
+            history = StreamlitChatMessageHistory()
+            prompt = st.chat_input("추가질문 할 내용을 입력하세요.")
         
-            with st.chat_message("assistant"):
-                callback = StreamlitCallbackHandler(st.container())
-                agent_chain = create_agent_chain(history)
-                response = agent_chain.invoke(
-                    {"input": prompt},
-                    callbacks=[callback]  # {"callback": [callback]} -> callbacks=[callback]
-                )
-                st.markdown(response["output"])
+            if prompt:
+                # 사용자 메시지 추가
+                with st.chat_message("user"):
+                    history.add_user_message(prompt)
+                    st.markdown(prompt)
+                    # 세션에 사용자 메시지 저장
+                    st.session_state.messages.append({"role": "user", "content": prompt})
+                
+                # AI 응답 생성 및 표시
+                with st.chat_message("assistant"):
+                    callback = StreamlitCallbackHandler(st.container())
+                    agent_chain = create_agent_chain(history)
+                    response = agent_chain.invoke(
+                        {"input": prompt},
+                        callbacks=[callback]
+                    )
+                    st.markdown(response["output"])
+                    # 세션에 AI 응답 저장
+                    st.session_state.messages.append({"role": "assistant", "content": response["output"]})
+        
+        with tab2:
+            # 이미지 URL을 저장할 session_state 초기화
+            if "generated_images" not in st.session_state:
+                st.session_state.generated_images = []
+            
+            client = OpenAI(api_key = st.secrets["OPENAI_API_KEY"])
+            prompt_image = st.chat_input("이미지와 관련된 설명을 해주세요")
+            
+            # 저장된 이미지들 표시
+            for img in st.session_state.generated_images:
+                st.image(img["url"], caption=f"Generated Image based on: {img['prompt']}")
+            
+            if prompt_image:  # 사용자가 입력했을 때만 실행
+                try:
+                    with st.spinner('이미지를 생성하고 있습니다...'):
+                        kwargs = {
+                            "prompt": f"{prompt_image}와 관련된 단어를 연상시키는 이미지를 만들어줘",
+                            "n": 1,
+                            "size": "512x512"
+                        }
+                        
+                        # 이미지 생성
+                        im = client.images.generate(**kwargs)
+                        img_url = im.data[0].url
+                        
+                        # 새로운 이미지를 session_state에 추가
+                        st.session_state.generated_images.append({
+                            "url": img_url,
+                            "prompt": prompt_image
+                        })
+                        
+                        # 이미지 표시
+                        st.image(img_url, caption=f"Generated Image based on: {prompt_image}")
+                
+                except Exception as e:
+                    st.error(f"이미지 생성 중 오류가 발생했습니다: {str(e)}")
+
+        with tab3:
+            audio_value = st.audio_input("Record a voice message")
+            if audio_value:
+                st.audio(audio_value)
 
 chatbot()
