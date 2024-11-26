@@ -15,29 +15,6 @@ openai.api_key = st.secrets["OPENAI_API_KEY"]
 if 'search_result' not in st.session_state:
     st.session_state['search_result'] = ""
 
-st.markdown(
-    """
-    <style>
-    <body {
-        font-size: 28px;
-    }
-    .stContainer {
-        margin-top: 0rem;
-        margin-bottom: 0rem;
-    }
-    input[type="text"], textarea[inputmode="text"] {
-        background-color: #F5F5DC;
-    }
-    button[kind="pills"] {
-        background-color: #FEFE4F;
-    }
-    .st-emotion-cache-1igbibe {
-        background-color: #FAB12F;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
 
 with st.container(border=True):
     col1, col2, col3 = st.columns(3)

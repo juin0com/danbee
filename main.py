@@ -34,23 +34,23 @@ supabase = init_connection()
 # rows = run_query() 
 
 # 이미지 파일 경로
-image_path = "./assets/banner_03.jpg"
+# image_path = "./assets/banner_03.jpg"
 
 # 이미지 로드
-image = Image.open(image_path)
+#image = Image.open(image_path)
 
 # 이미지 크기 지정 (픽셀 단위)
-image_width = 1792  # 원하는 가로 크기
-image_height = 500  # 원하는 세로 크기
+# image_width = 1792  # 원하는 가로 크기
+# image_height = 500  # 원하는 세로 크기
 
-image = image.resize((image_width, image_height))
+# image = image.resize((image_width, image_height))
 
 # 이미지 표시
 # st.image(image, caption='', use_column_width=True)
 # st.image(image, caption='', width=image_width, height=image_height)
-st.image(image, caption='')
+#st.image(image, caption='')
 
-# st.image("./assets/banner_10.png", use_container_width=True)
+st.image("./assets/banner.png", use_container_width=True, width=800)
 
 # Session state initialization
 if "user" not in st.session_state:

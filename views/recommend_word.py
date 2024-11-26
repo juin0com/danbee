@@ -16,14 +16,6 @@ def generate_random_words(num_words):
 
 word_list = generate_random_words(50)
 
-st.markdown("""
-<style>
-    .st-emotion-cache-1igbibe {
-        background-color: #FFD09B;  
-    }
-</style>
-""", unsafe_allow_html=True)
-
 st.title("추천단어")
 
 # 카테고리 선택 (radio)
