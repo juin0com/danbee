@@ -15,9 +15,12 @@ openai.api_key = st.secrets["OPENAI_API_KEY"]
 if 'search_result' not in st.session_state:
     st.session_state['search_result'] = ""
 
+st.subheader("🤖단어 검색")
 
-with st.container(border=True):
-    col1, col2, col3 = st.columns(3)
+@st.fragment
+def search_word():
+    with st.container(border=True):
+        col1, col2, col3 = st.columns(3)
     with col1:
         input_word = st.text_input("단어를 입력하세요.", value="", label_visibility="collapsed")
     with col2:
@@ -54,6 +57,11 @@ with st.container(border=True):
             st.session_state['search_result'] = response.choices[0].message.content
             if st.session_state['search_result']:
                 st.write(st.session_state['search_result'])    
+
+search_word()
+
+
+
 # agent making
 def create_agent_chain(history):
     chat = ChatOpenAI(
@@ -63,7 +71,8 @@ def create_agent_chain(history):
     )
     
     # Duolingo, Memrise는 기본 제공 도구가 아님
-    tools = load_tools(["wikipedia","ddg-search", "Google Search"])
+    #tools = load_tools(["wikipedia","ddg-search"])
+    tools = load_tools(["wikipedia","ddg-search"])
     
     prompt = hub.pull("hwchase17/openai-tools-agent")
     memory = ConversationBufferMemory(
@@ -75,22 +84,26 @@ def create_agent_chain(history):
     agent = create_openai_tools_agent(chat, tools, prompt)
     return AgentExecutor(agent=agent, tools=tools, memory=memory)
 
-with st.container(border=True):
-    st.subheader("🎈단비노트 챗봇서비스🎈")
+@st.fragment
+def chatbot():
+    with st.container(border=True):
+        st.subheader("🎈단비노트 챗봇서비스🎈")
 
-    history = StreamlitChatMessageHistory()
-    prompt = st.chat_input("검색할 단어를 입력하세요.")
+        history = StreamlitChatMessageHistory()
+        prompt = st.chat_input("추가질문 할 내용을 입력하세요.")
 
-    if prompt:
-        with st.chat_message("user"):
-            history.add_user_message(prompt)
-            st.markdown(prompt)
-    
-        with st.chat_message("assistant"):
-            callback = StreamlitCallbackHandler(st.container())
-            agent_chain = create_agent_chain(history)
-            response = agent_chain.invoke(
-                {"input": prompt},
-                callbacks=[callback]  # {"callback": [callback]} -> callbacks=[callback]
-            )
-            st.markdown(response["output"])
+        if prompt:
+            with st.chat_message("user"):
+                history.add_user_message(prompt)
+                st.markdown(prompt)
+        
+            with st.chat_message("assistant"):
+                callback = StreamlitCallbackHandler(st.container())
+                agent_chain = create_agent_chain(history)
+                response = agent_chain.invoke(
+                    {"input": prompt},
+                    callbacks=[callback]  # {"callback": [callback]} -> callbacks=[callback]
+                )
+                st.markdown(response["output"])
+
+chatbot()
