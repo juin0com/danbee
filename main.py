@@ -1,9 +1,24 @@
 import os , time
 import streamlit as st
 from supabase import create_client, Client
+from PIL import Image
 
 # page setup
 st.set_page_config(layout="wide")
+st.markdown("""
+<style>
+    # .st-emotion-cache-bm2z3a {
+    #     background-color: #D4C6B1;
+    # }
+	.st-emotion-cache-sih973 {
+        padding-top: 200px;
+    }
+
+    # .st-emotion-cache-n5r31u {
+    #     background-color: #88C273;  
+    # }
+</style>
+""", unsafe_allow_html=True)
 st.logo("./assets/sidebar_revised.png",size="large")
 @st.cache_resource
 def init_connection():
@@ -16,10 +31,26 @@ supabase = init_connection()
 # @st.cache_resource(ttl=600)
 # def run_query():
 #     return supabase.table("mytable").select("*").execute()
-# rows = run_query()
+# rows = run_query() 
 
+# 이미지 파일 경로
+image_path = "./assets/banner_03.jpg"
 
-st.image("./assets/banner_10.png", use_container_width=True)
+# 이미지 로드
+image = Image.open(image_path)
+
+# 이미지 크기 지정 (픽셀 단위)
+image_width = 1792  # 원하는 가로 크기
+image_height = 500  # 원하는 세로 크기
+
+image = image.resize((image_width, image_height))
+
+# 이미지 표시
+# st.image(image, caption='', use_column_width=True)
+# st.image(image, caption='', width=image_width, height=image_height)
+st.image(image, caption='')
+
+# st.image("./assets/banner_10.png", use_container_width=True)
 
 # Session state initialization
 if "user" not in st.session_state:
@@ -124,7 +155,6 @@ pg = st.navigation(
 
 # shared on all pages
 st.sidebar.text("단비노트에서 나만의 단어장을 만들어보세요!")
-
 
 # Run navigation
 pg.run()

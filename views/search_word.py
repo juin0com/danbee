@@ -18,9 +18,21 @@ if 'search_result' not in st.session_state:
 st.markdown(
     """
     <style>
+    <body {
+        font-size: 28px;
+    }
     .stContainer {
         margin-top: 0rem;
         margin-bottom: 0rem;
+    }
+    input[type="text"], textarea[inputmode="text"] {
+        background-color: #F5F5DC;
+    }
+    button[kind="pills"] {
+        background-color: #FEFE4F;
+    }
+    .st-emotion-cache-1igbibe {
+        background-color: #FAB12F;
     }
     </style>
     """,
@@ -74,7 +86,7 @@ def create_agent_chain(history):
     )
     
     # Duolingo, Memrise는 기본 제공 도구가 아님
-    tools = load_tools(["wikipedia"])
+    tools = load_tools(["wikipedia","ddg-search", "Google Search"])
     
     prompt = hub.pull("hwchase17/openai-tools-agent")
     memory = ConversationBufferMemory(

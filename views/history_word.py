@@ -3,6 +3,14 @@ import random
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 
+st.markdown(
+    """
+    <style>
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 st.title("이전학습단어")
 
 # 기간 선택
@@ -34,5 +42,6 @@ st.pyplot(fig)
 # 단어 클릭 시 검색 페이지로 이동
 st.write("단어를 클릭하면 검색 페이지로 이동합니다:")
 for word in review_words:
-    search_url = f"./views/search_word.py?query={word}"
-    st.markdown(f"- [{word}]({search_url})")
+    search_url = f"/?query={word}"
+    aTag = f"<a href='{search_url}' target='_self'>{word}</a> "
+    st.markdown(f"- {aTag}", unsafe_allow_html=True)

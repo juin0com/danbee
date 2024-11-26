@@ -16,12 +16,22 @@ def generate_random_words(num_words):
 
 word_list = generate_random_words(50)
 
+st.markdown("""
+<style>
+    .st-emotion-cache-1igbibe {
+        background-color: #FFD09B;  
+    }
+</style>
+""", unsafe_allow_html=True)
+
 st.title("추천단어")
 
 # 카테고리 선택 (radio)
 selected_theme = st.radio(
     "카테고리를 선택하세요",
-    options=['전체', '자연', '기술', '예술', '과학', '문학']
+    options=['전체', '자연', '기술', '예술', '과학', '문학', '경제', '스포츠', '역사'] , 
+    label_visibility="hidden",
+    horizontal=True,
 )
 
 # 중요도 선택 (slider)

@@ -5,7 +5,7 @@ from openai import OpenAI
 client = OpenAI(api_key = st.secrets["OPENAI_API_KEY"])
 
 kwargs = {
-    "prompt": "이종섭 스타일로 멋진 강아지 사진 만들어줘"
+    "prompt": "멋진 강아지 사진 만들어줘"
 }
 
 # 이미지 생성
