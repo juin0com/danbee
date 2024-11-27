@@ -7,16 +7,16 @@ from PIL import Image
 st.set_page_config(layout="wide")
 st.markdown("""
 <style>
-    # .st-emotion-cache-bm2z3a {
-    #     background-color: #D4C6B1;
-    # }
+    .st-emotion-cache-bm2z3a {
+        /*background-color: #F5F5DC;*/
+    }
 	.st-emotion-cache-sih973 {
         padding-top: 200px;
     }
 
-    # .st-emotion-cache-n5r31u {
-    #     background-color: #88C273;  
-    # }
+    .st-emotion-cache-n5r31u {
+       /* background-color: #88C273;  */
+    }
 </style>
 """, unsafe_allow_html=True)
 st.logo("./assets/sidebar_revised.png",size="large")
@@ -34,21 +34,22 @@ supabase = init_connection()
 # rows = run_query() 
 
 # 이미지 파일 경로
-# image_path = "./assets/banner_03.jpg"
+# image_path = "./assets/banner.png"
+image_path = "./assets/banner_10.png"
 
 # 이미지 로드
-#image = Image.open(image_path)
+image = Image.open(image_path)
 
 # 이미지 크기 지정 (픽셀 단위)
-# image_width = 1792  # 원하는 가로 크기
-# image_height = 500  # 원하는 세로 크기
+image_width = 1792  # 원하는 가로 크기
+image_height = 500  # 원하는 세로 크기
 
-# image = image.resize((image_width, image_height))
+image = image.resize((image_width, image_height))
 
 # 이미지 표시
 # st.image(image, caption='', use_column_width=True)
 # st.image(image, caption='', width=image_width, height=image_height)
-#st.image(image, caption='')
+# st.image(image, caption='')
 
 st.image("./assets/banner.png", use_container_width=True, width=800)
 

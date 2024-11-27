@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 st.markdown(
     """
     <style>
+        .st-emotion-cache-1igbibe  {
+           /* background-color: #FFD09B;*/  
+        }
     </style>
     """,
     unsafe_allow_html=True
@@ -41,7 +44,11 @@ st.pyplot(fig)
 
 # 단어 클릭 시 검색 페이지로 이동
 st.write("단어를 클릭하면 검색 페이지로 이동합니다:")
+
 for word in review_words:
-    search_url = f"/?query={word}"
-    aTag = f"<a href='{search_url}' target='_self'>{word}</a> "
-    st.markdown(f"- {aTag}", unsafe_allow_html=True)
+    # search_url = f"/?query={word}"
+    # aTag = f"<a href='{search_url}' target='_self'>{word}</a> "
+    # st.markdown(f"- {aTag}", unsafe_allow_html=True)
+    if st.button(f"{word}"):
+        st.session_state['search_word'] = word
+        st.switch_page("views/search_word.py")

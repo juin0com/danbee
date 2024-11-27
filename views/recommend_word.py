@@ -11,6 +11,14 @@ response = supabase.table('word_list').select('category').execute()
 categories = list(set([item['category'] for item in response.data if item['category']]))
 categories.insert(0, '전체')  # '전체' 옵션 추가
 
+st.markdown("""
+<style>
+    .st-emotion-cache-1igbibe {
+       /* background-color: #FAB12F;*/
+    }
+</style>
+""", unsafe_allow_html=True)
+
 st.subheader("🔎 검색조건을 입력하세요")
 with st.container(border=True):
     # 사용자 입력 받기
@@ -51,7 +59,7 @@ with st.container():
         st.write("선택한 조건의 단어가 없습니다")
 
 # 검색 페이지로 연결
-if 'search_word' in st.session_state:
-    import webbrowser
-    search_url = f"/views/search_word.py?query={st.session_state['search_word']}"
-    webbrowser.open(search_url)
+# if 'search_word' in st.session_state:
+#     import webbrowser
+#     search_url = f"/views/search_word.py?query={st.session_state['search_word']}"
+#     webbrowser.open(search_url)

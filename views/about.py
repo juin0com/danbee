@@ -27,7 +27,7 @@ with st.container():
         st.markdown("**올인원 Pass! 인공지능 프로젝트 마스터** 과정의 네모난상상 팀의 프로젝트입니다.")
         st.write("아직은 부족한게 많지만 더 나은 서비스를 위해 응원부탁드립니다.")
     with col2:
-        # st.image("./assets/logo_about.jpg", use_container_width=True)
-        st.image("./assets/logo_about02.jpg", use_container_width=True)
+        st.image("./assets/logo_about.jpg", use_container_width=True)
+        # st.image("./assets/logo_about02.jpg", use_container_width=True)
 
 

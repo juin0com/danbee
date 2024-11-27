@@ -16,6 +16,25 @@ openai.api_key = st.secrets["OPENAI_API_KEY"]
 if 'search_result' not in st.session_state:
     st.session_state['search_result'] = ""
 
+st.markdown(
+    """
+    <style>
+        .stContainer {
+            margin-top: 0rem;
+            margin-bottom: 0rem;
+        }
+
+        input[type="text"], textarea[inputmode="text"] {
+            /*background-color: #F5F5DC;*/
+        }
+        .st-emotion-cache-1igbibe {
+            /*background-color: #FAB12F;*/
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 st.subheader("🤖단어 검색")
 
 # CSS를 페이지 상단에 추가
